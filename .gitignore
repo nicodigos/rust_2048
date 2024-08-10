@@ -1,0 +1,27 @@
+# Build output
+/target/
+
+# Rust-specific
+Cargo.lock # Exclude for libraries but keep for applications
+
+# Backup files
+*.rs.bk
+*.bak
+*.tmp
+
+# IDE/editor specific
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Environment variables
+.env
+
+# Logs
+*.log
+

@@ -1,3 +1,4 @@
+use core::panic;
 use std::vec;
 use std::ops::Range;
 use rand::Rng;
@@ -19,6 +20,7 @@ fn main() {
             Direction::Down => println!("down"),
             Direction::Left => println!("left"),
             Direction::Right => println!("right"),
+            _ => panic!("Unexpected Error")
         }
 
         new_board.movement(directions[random_index]);
@@ -45,12 +47,13 @@ impl Default for Board {
     
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum Direction {
     Up,
     Down,
     Right,
-    Left
+    Left,
+    UndoUp
 }
 
 impl Board {
@@ -102,7 +105,12 @@ impl Board {
             *&mut rearranged_board[selected_position[0]][selected_position[1]] = 2;
         }
 
-        *&mut self.array = Board::static_rearrange_board(&mut rearranged_board, &direction);
+        if direction != Direction::Up {
+            *&mut self.array = Board::static_rearrange_board(&mut rearranged_board, &direction);
+        } else {
+            let new_direction = Direction::UndoUp;
+            *&mut self.array = Board::static_rearrange_board(&mut rearranged_board, &new_direction);
+        }
 
 
     }
@@ -113,16 +121,19 @@ impl Board {
         match *direction {
             Direction::Up => Board::static_vertical_rearrange(0..4,
                                     "rev",
-                                                    copy_array),
+                                                    copy_array, false),
             Direction::Down => Board::static_vertical_rearrange(0..4,
                                 "none",
-                                    copy_array),
+                                    copy_array,false),
             Direction::Left => {for array in &mut copy_array {
                                     array.reverse()
                                 }
                                 copy_array
                                 },
-            Direction::Right => copy_array
+            Direction::Right => copy_array,
+            Direction::UndoUp => Board::static_vertical_rearrange(0..4,
+                            "rev",
+                                copy_array, true),
 
         }
 
@@ -131,9 +142,10 @@ impl Board {
 
     pub fn static_vertical_rearrange(range_rows: Range<usize>, 
                           range_instructions: &str,
-                          array_2d: Vec<Vec<i16>>) -> Vec<Vec<i16>> {
+                          array_2d: Vec<Vec<i16>>,
+                        undo_up_check:bool) -> Vec<Vec<i16>> {
 
-
+                let mut array_2d = array_2d.clone();
                 let vec_range: Vec<usize>;
                 if range_instructions == "rev" {
                     vec_range = range_rows.rev().collect();
@@ -143,15 +155,29 @@ impl Board {
      
                 let mut new_array: Vec<Vec<i16>> = Vec::new();
                 let mut array: Vec<i16> = Vec::new(); 
-                // iterate over columns of the copy_array              
-                for c in 0..4 {
-                    // iterate over rows of the copy_array
-                    for r in &vec_range {
-                        array.push(array_2d[*r][c].clone())
+
+                let undo_up_checker = if undo_up_check {
+                    3
+                } else {
+                    1
+                };
+
+                for _ in 0..undo_up_checker {
+                    new_array.clear();
+                    for c in 0..4 {
+                        // iterate over rows of the copy_array
+                        for r in &vec_range {
+                            array.push(array_2d[*r][c].clone())
+                        }
+                        new_array.push(array.clone());
+                        array.clear();    
                     }
-                    new_array.push(array.clone());
-                    array.clear();    
+                    array_2d = new_array.clone();
+                    
+                  
                 }
+                // iterate over columns of the copy_array              
+                
                 new_array
         
     }

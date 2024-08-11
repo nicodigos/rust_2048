@@ -13,7 +13,7 @@ fn main() {
                           Direction::Right,
                         ];
     let mut rng = rand::thread_rng();
-    for _i in 0..20 {
+    for _i in 0..60 {
         let random_index = rng.gen_range(0..directions.len());
         match &directions[random_index] {
             Direction::Up => println!("up"),
@@ -57,7 +57,7 @@ enum Direction {
 }
 
 impl Board {
-    fn display_array(&self) {
+    pub fn display_array(&self) {
         for array in self.array.iter() {
             let mut row_str:String = String::from("[ ");
             for element in array.iter() {
@@ -69,21 +69,21 @@ impl Board {
         println!()        
     }
 
-    fn movement(&mut self, direction:Direction) {
+    pub fn movement(&mut self, direction:Direction) {
         let mut rearranged_board = Board::static_rearrange_board(&mut self.array.clone(),&direction);
         for array in &mut rearranged_board {
-            let num_of_zeroes = array.iter().filter(|&&x| x == 0).count();
+            let mut num_of_zeroes = array.iter().filter(|&&x| x == 0).count();
             array.retain(|&x| x != 0);
             for i in (1..array.len()).rev() {
                 if array[i] == array[i-1] {
                     array[i] = array[i] * 2;
                     array[i-1] = 0;
                     array.retain(|&x| x != 0);
-                    array.insert(0,0);
+                    num_of_zeroes += 1;
                 }
             }
 
-            for i in (0..num_of_zeroes) {
+            for _ in 0..num_of_zeroes {
                 array.insert(0,0);
             }
         }
@@ -140,7 +140,7 @@ impl Board {
         
     }
 
-    pub fn static_vertical_rearrange(range_rows: Range<usize>, 
+    fn static_vertical_rearrange(range_rows: Range<usize>, 
                           range_instructions: &str,
                           array_2d: Vec<Vec<i16>>,
                         undo_up_check:bool) -> Vec<Vec<i16>> {
@@ -164,6 +164,7 @@ impl Board {
 
                 for _ in 0..undo_up_checker {
                     new_array.clear();
+                    // iterate over columns of the copy_array 
                     for c in 0..4 {
                         // iterate over rows of the copy_array
                         for r in &vec_range {
@@ -176,7 +177,7 @@ impl Board {
                     
                   
                 }
-                // iterate over columns of the copy_array              
+                             
                 
                 new_array
         

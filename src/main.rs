@@ -13,7 +13,7 @@ fn main() {
         Direction::Right,
     ];
     let mut rng = rand::thread_rng();
-    for _i in 0..3 {
+    for _i in 0..60 {
         let random_index = rng.gen_range(0..directions.len());
         match &directions[random_index] {
             Direction::Up => println!("up"),
@@ -86,6 +86,7 @@ impl Board {
                     num_of_zeroes += 1;
                 }
             }
+
 
             for _ in 0..num_of_zeroes {
                 array.insert(0, 0);
@@ -192,6 +193,28 @@ impl Board {
 
     }
 }
+
+//     let mut board = String::from( "+------+------+------+------+
+// |      |      |      |      |
+// +------+------+------+------+
+// |      |      |      |      |
+// +------+------+------+------+
+// |      |      |      |      |
+// +------+------+------+------+
+// |      |      |      |      |
+// +------+------+------+------+
+// ")
+
+// println!("{}", board);
+
+// let str_new_board = format!("{}{}{}",
+//                 &board[0..100],
+//                 "2",
+//                 &board[101..]);
+
+// let board = String::from(str_new_board);
+
+// println!("{}", board);
 
 //     let mut board = String::from( "+------+------+------+------+
 // |      |      |      |      |
